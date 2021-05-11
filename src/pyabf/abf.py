@@ -435,7 +435,7 @@ class ABF:
                           count=self.dataPointCount)
         else:
             print('  _loadAndScaleData using RAW ***')
-            #print('  type(fb.getbuffer())', type(fb.getbuffer()))
+            print('  type(fb)', type(fb))
             readFromFile = False
             #raw = np.frombuffer(fb.getbuffer(), dtype=self._dtype, count=self.dataPointCount)
             raw = np.frombuffer(fb.read(), dtype=self._dtype, count=self.dataPointCount)
