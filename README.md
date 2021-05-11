@@ -37,6 +37,9 @@ To install this fork, you need to use the following because setup.py is in a sub
 pip install "git+https://github.com/cudmore/pyABF#egg=pyabf&subdirectory=src"
 ```
 
+I also removed docs, data, and dev folders to make my pip install from git+https relatively faster.
+
+
 I will eventually try and merge this with the master...
 
 **pyABF is a Python library for reading electrophysiology data from Axon Binary Format (ABF) files.** It was created with the goal of providing a Pythonic API to access the content of ABF files which is so intuitive to use (with a predictive IDE) that documentation is largely unnecessary. Flip through the **[pyABF Tutorial](https://swharden.com/pyabf/tutorial)** and you'll be analyzing data from your ABF files in minutes!
