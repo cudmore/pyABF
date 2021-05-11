@@ -34,6 +34,7 @@ import datetime
 import numpy as np
 from pathlib import PureWindowsPath
 import hashlib
+import io # abb
 
 import logging
 logging.basicConfig(level=logging.WARN)
@@ -56,26 +57,51 @@ class ABF:
     def __init__(self, abfFilePath, loadData=True,
                  cacheStimulusFiles=True, stimulusFileFolder=None):
 
-        if abfFilePath.lower().endswith(".atf"):
+        isFileStr = isinstance(abfFilePath,str) # abb
+
+        if isFileStr:
+            #print('pyabf loading from file:', abfFilePath)
+            pass
+        else:
+            print('pyabf loading from binary stream')
+
+        if isFileStr and abfFilePath.lower().endswith(".atf"):
             raise Exception("use pyabf.ATF (not pyabf.ABF) for ATF files")
 
         self._preLoadData = loadData
         self._cacheStimulusFiles = cacheStimulusFiles
 
-        self.abfFilePath = os.path.abspath(abfFilePath)
-        self.abfFolderPath = os.path.dirname(self.abfFilePath)
+        # abb
+        if isFileStr:
+            self.abfFilePath = os.path.abspath(abfFilePath)
+            self.abfFolderPath = os.path.dirname(self.abfFilePath)
+        else:
+            self.abfFilePath = ''
+            self.abfFolderPath = ''
 
         if stimulusFileFolder:
             self.stimulusFileFolder = stimulusFileFolder
         else:
             self.stimulusFileFolder = self.abfFolderPath
 
-        if not os.path.exists(self.abfFilePath):
+        # abb
+        if isFileStr and not os.path.exists(self.abfFilePath):
             raise ValueError("ABF file does not exist: %s" % self.abfFilePath)
-        self.abfID = os.path.splitext(os.path.basename(self.abfFilePath))[0]
+        if isFileStr:
+            self.abfID = os.path.splitext(os.path.basename(self.abfFilePath))[0]
+        else:
+            self.abfID = None # abb, not sure if seelf.abfID is needed?
         log.debug(self.__repr__())
 
-        with open(self.abfFilePath, 'rb') as fb:
+        # abb
+        #with open(self.abfFilePath, 'rb') as fb:
+        if isFileStr:
+            fb = open(self.abfFilePath, 'rb')
+        else:
+            fb = abfFilePath # abfFilePath is a binary stream
+
+        # abb, TODO: refactor to use 'with' in both cases
+        if 1:
 
             # get a preliminary ABF version from the ABF file itself
             self.abfVersion = {}
@@ -400,8 +426,20 @@ class ABF:
 
         # read the data from the ABF file
         fb.seek(self.dataByteStart)
-        raw = np.fromfile(fb, dtype=self._dtype,
+
+        # abb file and data stream
+        if isinstance(fb, io.BufferedReader):
+            print('  _loadAndScaleData using np.fromFile for io.BufferedReader')
+            readFromFile = True
+            raw = np.fromfile(fb, dtype=self._dtype,
                           count=self.dataPointCount)
+        else:
+            print('  _loadAndScaleData using RAW ***')
+            #print('  type(fb.getbuffer())', type(fb.getbuffer()))
+            readFromFile = False
+            #raw = np.frombuffer(fb.getbuffer(), dtype=self._dtype, count=self.dataPointCount)
+            raw = np.frombuffer(fb.read(), dtype=self._dtype, count=self.dataPointCount)
+
         nRows = self.channelCount
         nCols = int(self.dataPointCount/self.channelCount)
         raw = np.reshape(raw, (nCols, nRows))
