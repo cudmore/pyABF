@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 class ATF():
     """
-    The ATF class provides simplistic access to the header and data which exist 
+    The ATF class provides simplistic access to the header and data which exist
     in Axon Text Format (ATF) files. This class supports the reading of multi-
     channel data and has a setSweep() function similar to the ABF class.
     """
@@ -56,6 +56,9 @@ class ATF():
         self.header = {}
         for headerItemNumber in range(nHeaderItems):
             headerLine = fh.readline().strip()
+            # abb
+            if headerLine.startswith('"Comment='):
+                continue
             if headerLine.count('"') == 2:
                 key, val = headerLine.strip('"').split("=")
                 if val.isdigit():
@@ -149,5 +152,5 @@ if __name__ == "__main__":
             for sweepNumber in atf.sweepList:
                 atf.setSweep(sweepNumber, channel)
                 plt.plot(atf.sweepX, atf.sweepY)
-            
+
     plt.show()

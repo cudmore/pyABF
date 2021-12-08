@@ -74,7 +74,8 @@ class Stimulus:
 
         elif nWaveformSource == 2:
             self.text = "DAC waveform is controlled by custom file"
-            return stimulusWaveformFromFile(self.abf)
+            # abb added stimulusSweep
+            return stimulusWaveformFromFile(self.abf, stimulusSweep=stimulusSweep)
 
         else:
             self.text = "unknown nWaveformSource (%d)" % nWaveformSource
@@ -123,8 +124,8 @@ def findStimulusWaveformFile(abf, channel=0):
 
     return None
 
-
-def stimulusWaveformFromFile(abf, channel=0):
+# abb stimulusSweep=None
+def stimulusWaveformFromFile(abf, channel=0, stimulusSweep=None):
     """
     Attempt to find the stimulus file used to record an ABF, read the stimulus
     file (ABF or ATF), and return the stimulus waveform (as a numpy array).
@@ -144,6 +145,8 @@ def stimulusWaveformFromFile(abf, channel=0):
                 cachedStimuli[stimPath] = pyabf.ABF(stimPath)
             elif stimPath.upper().endswith(".ATF"):
                 cachedStimuli[stimPath] = pyabf.ATF(stimPath)
+        # abb, setSweep
+        cachedStimuli[stimPath].setSweep(stimulusSweep)
         return cachedStimuli[stimPath].sweepY
     else:
         if stimPath.upper().endswith(".ABF"):
