@@ -58,8 +58,11 @@ class ATF():
             headerLine = fh.readline().strip()
             # abb
             if headerLine.startswith('"Comment='):
-                continue
-            if headerLine.count('"') == 2:
+                key = 'comment'
+                headerLine = headerLine.replace('"Comment=', '')
+                headerLine = headerLine.replace('"', '')
+                val = headerLine
+            elif headerLine.count('"') == 2:
                 key, val = headerLine.strip('"').split("=")
                 if val.isdigit():
                     val = int(val)

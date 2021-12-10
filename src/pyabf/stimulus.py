@@ -124,6 +124,14 @@ def findStimulusWaveformFile(abf, channel=0):
 
     return None
 
+# abb to get comment
+def abbCommentFromFile(abf, channel=0):
+    stimPath = findStimulusWaveformFile(abf, channel)
+    if stimPath is None:
+        return None
+    else:
+        return cachedStimuli[stimPath].header['comment']
+
 # abb stimulusSweep=None
 def stimulusWaveformFromFile(abf, channel=0, stimulusSweep=None):
     """
@@ -144,6 +152,7 @@ def stimulusWaveformFromFile(abf, channel=0, stimulusSweep=None):
             if stimPath.upper().endswith(".ABF"):
                 cachedStimuli[stimPath] = pyabf.ABF(stimPath)
             elif stimPath.upper().endswith(".ATF"):
+                print('abb assigning cachedStimuli')
                 cachedStimuli[stimPath] = pyabf.ATF(stimPath)
         # abb, setSweep
         cachedStimuli[stimPath].setSweep(stimulusSweep)

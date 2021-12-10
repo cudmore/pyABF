@@ -429,7 +429,7 @@ class ABF:
 
         # abb file and data stream
         if isinstance(fb, io.BufferedReader):
-            print('  _loadAndScaleData using np.fromFile for io.BufferedReader')
+            #print('  _loadAndScaleData using np.fromFile for io.BufferedReader')
             readFromFile = True
             raw = np.fromfile(fb, dtype=self._dtype,
                           count=self.dataPointCount)
